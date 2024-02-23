@@ -6,113 +6,73 @@
  */
 
 import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import Game from './components/Game';
+import Splash from './components/Splash';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const words = [
+  'hangman',
+  'apple',
+  'banana',
+  'cherry',
+  'date',
+  'elderberry',
+  'fig',
+  'grape',
+  'honey',
+];
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+const randomWord = (): string => {
+  return words[Math.floor(Math.random() * words.length)];
+};
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+export default function App(): React.JSX.Element {
+  const [word, setWord] = React.useState(randomWord());
+  const [runningGame, setRunningGame] = React.useState(false);
+  const [difficulty, setDifficulty] = React.useState(6);
+  const [rightGuesses, setRightGuesses] = React.useState(0);
+  const [wrongGuesses, setWrongGuesses] = React.useState(0);
+  const [winOrLose, setWinOrLose] = React.useState(false);
+  const [winGame, setWinGame] = React.useState(false);
+  const finishedGame = ({
+    guessedLetters,
+    wrongLetters,
+    win,
+  }: {
+    guessedLetters: string[];
+    wrongLetters: string[];
+    win: boolean;
+  }) => {
+    setRunningGame(false);
+    setWinGame(win);
+    setWinOrLose(true);
+    setRightGuesses(guessedLetters.length);
+    setWrongGuesses(wrongLetters.length);
+  };
+  const newGame = () => {
+    setWord(randomWord());
+    setRunningGame(true);
+    setWinGame(false);
+    setWinOrLose(false);
+    setRightGuesses(0);
+    setWrongGuesses(0);
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <React.Fragment>
+      {runningGame && (
+        <Game word={word} maxGuesses={difficulty} onGameEnd={finishedGame} />
+      )}
+      {!runningGame && (
+        <Splash
+          newGame={newGame}
+          setGameDifficulty={setDifficulty}
+          winOrLose={winOrLose}
+          win={winGame}
+          difficulty={difficulty}
+          rightGuesses={rightGuesses}
+          wrongGuesses={wrongGuesses}
+        />
+      )}
+    </React.Fragment>
   );
 }
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
-
-export default App;

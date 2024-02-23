@@ -1,4 +1,6 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# React Native Hangman
+
+This is a very basic version of hangman created with React Native to demonstrate that I know how to use React Native.
 
 # Getting Started
 
